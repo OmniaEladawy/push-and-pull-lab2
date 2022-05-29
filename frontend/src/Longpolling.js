@@ -7,10 +7,8 @@ function Longpolling() {
     const [messages,setMessages]=useState([]);
 
     const data = () =>{
-        setInterval(()=>{
             fetch(`${backUrl}/longMessages-sub`).then(res => res.json())
             .then(data =>setMessages(messages.concat(data))).catch(console.log);
-        },5000)
     }
 
     useEffect(() => {

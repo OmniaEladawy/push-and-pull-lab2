@@ -8,8 +8,8 @@ function Longpolling() {
 
     const data = () =>{
         setInterval(()=>{
-            fetch(`${backUrl}/longMessages`).then(res => res.json())
-            .then(data =>setMessages(data)).catch(console.log);
+            fetch(`${backUrl}/longMessages-sub`).then(res => res.json())
+            .then(data =>setMessages(messages.concat(data))).catch(console.log);
         },5000)
     }
 

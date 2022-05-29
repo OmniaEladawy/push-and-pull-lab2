@@ -22,9 +22,9 @@ app.get('/messages' , (req,res)=>{
 /////long polling
 const sub = {};
 
-app.get('/longMessages' , (req,res)=>{
+app.get('/longMessages-sub' , (req,res)=>{
     const id = Math.ceil(Math.random()* 10000);
-    sub[id] = res; ////hang req
+    sub[id] = res; 
 
 })
 

@@ -1,42 +1,36 @@
-const express = require('express');
-const cors = require('cors');
-
+const express = require("express");
 const app = express();
-
-const messages = [];
-
-app.use(express.json());
+const http = require("http");
+const cors = require("cors");
+const { Server } = require("socket.io");
 app.use(cors());
 
-app.post('/messages' , (req,res)=>{
-    const {body} = req;
-    messages.push(body);
-    console.log(body);
-    res.status(204).end;
-})
+const server = http.createServer(app);
 
-app.get('/messages' , (req,res)=>{
-    res.json(messages);
-})
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
+});
 
-/////long polling
-const sub = {};
+io.on("connection", (socket) => {
+  console.log(`User Connected: ${socket.id}`);
 
-app.get('/longMessages-sub' , (req,res)=>{
-    const id = Math.ceil(Math.random()* 10000);
-    sub[id] = res; 
+  socket.on("join_room", (data) => {
+    socket.join(data);
+    console.log(`User with ID: ${socket.id} joined room: ${data}`);
+  });
 
-})
+  socket.on("send_message", (data) => {
+    socket.to(data.room).emit("receive_message", data);
+  });
 
-app.post('/longMessages' , (req,res)=>{
-    const {body} = req;
-    Object.entries(sub).forEach(([id,response])=>{
-        response.json(body);
-        delete sub[id];
-    });
-    res.status(204).end();
-})
+  socket.on("disconnect", () => {
+    console.log("User Disconnected", socket.id);
+  });
+});
 
-app.listen(3000,()=>{
-    console.log("app running");
-}) 
+server.listen(5555, () => {
+  console.log("SERVER RUNNING");
+});
